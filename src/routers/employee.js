@@ -6,7 +6,7 @@ const router = new express.Router()
 
 
 router.post('/register', async (req, res) => {
-
+    console.log(req.body)
     const user = new Employee(req.body)
     try{
         await user.save()
@@ -27,9 +27,11 @@ router.post('/login', async (req, res) => {
     }
 })
 
-router.get('/employees/searchByName', async (req, res) => {
+router.post('/employees/searchByName', async (req, res) => {
+    console.log(req)
     try {
         const filteredUsers = await Employee.find({fullname: req.body.fullname})
+        console.log(filteredUsers)
         res.send({filteredUsers})
     }
     catch(err){
@@ -39,7 +41,7 @@ router.get('/employees/searchByName', async (req, res) => {
     }
 })
 
-router.get('/employees/searchByStatus', async (req, res) => {
+router.post('/employees/searchByStatus', async (req, res) => {
     try {
         const filteredUsers = await Employee.find({status: req.body.status}).exec()
         res.send({filteredUsers})
@@ -49,33 +51,22 @@ router.get('/employees/searchByStatus', async (req, res) => {
     }
 })
 
-router.get('/me', async (req, res) => {
+router.post('/employees', async (req, res) => {
     try{
-        const me = await Employee.findOne({email: req.body.email}).exec();
-        res.send({me})
+        const employees = await Employee.find({}).exec();
+        res.send({employees})
     } catch(err){
         res.status(400).send()
     }
 
 })
 
-router.patch('/me', async (req, res) =>{
-    const updates = Object.keys(req.body)
-    const allowedUpdates = ['status']
-    const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
-
-    if(!isValidOperation){
-        return res.status(400).send({ error: 'Invalid updates'})
-    }
-
-    try{
-        const me = await Employee.findOne({email: req.body.email}).exec();
-        updates.forEach((update) => me[update] = req.body[update])
-        await me.save()
-        res.send(me)
-    } catch(err) {
-        res.status(400).send(err)  
-    }
+router.put('/me', async (req, res) =>{
+    const email = req.body.email
+    const status = req.body.status
+    const updatedEmployee = await Employee.findOneAndUpdate({email}, {status})
+    updatedEmployee.save()
+    res.send({updatedEmployee})
 })
 
 

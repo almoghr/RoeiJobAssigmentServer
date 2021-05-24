@@ -22,7 +22,6 @@ const employeeSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['Working', 'On Vacation', 'Lunch Time', 'BuisnessTrip'],
         required : true,
         default: 'Working'
 }
